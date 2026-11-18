@@ -1,0 +1,56 @@
+name: Deploy production
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to Hetzner
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: 65.109.136.166
+          username: root
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            set -e
+
+            if [ ! -d /var/www/cestasmart-server/.git ]; then
+              echo "Clone the repo to /var/www/cestasmart-server before the first deploy."
+              exit 1
+            fi
+
+            if [ ! -f /var/www/cestasmart-server/.env ]; then
+              echo "Create /var/www/cestasmart-server/.env before the first deploy."
+              exit 1
+            fi
+
+            cd /var/www/cestasmart-server
+
+            echo "Pulling latest main..."
+            git fetch origin main
+            git reset --hard origin/main
+
+            echo "Installing dependencies..."
+            npm ci
+
+            echo "Generating Prisma Client..."
+            npx prisma generate
+
+            echo "Applying database migrations..."
+            npx prisma migrate deploy
+
+            echo "Building application..."
+            npm run build
+
+            echo "Restarting application..."
+            if pm2 describe cestasmart-server >/dev/null 2>&1; then
+              pm2 restart cestasmart-server --update-env
+            else
+              pm2 start dist/main.js --name cestasmart-server --cwd /var/www/cestasmart-server
+              pm2 save
+            fi
+
+            echo "Deployment complete!"

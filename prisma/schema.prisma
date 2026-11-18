@@ -1,0 +1,311 @@
+// La Vida Sana tables, stored in the cestasmart PostgreSQL database.
+// Column names match the payloads LaVidaSanaMenu sends to Supabase (snake_case).
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model MercadonaCategory {
+  id          String   @id
+  name        String
+  name_en     String?
+  parent_id   String?
+  order_index Int      @default(0)
+  is_not_food Boolean  @default(false)
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+
+  products MercadonaProduct[]
+  links    MercadonaCategoryProduct[]
+
+  @@index([parent_id])
+  @@map("mercadona_categories")
+}
+
+model MercadonaProduct {
+  id                      String   @id
+  name                    String
+  description             String?
+  brand                   String?
+  quantity                Decimal? @db.Decimal(10, 2)
+  packaging               String?
+  size_format             String?
+  size                    Decimal? @db.Decimal(10, 2)
+  ud_size_format          String?
+  ud_size                 Decimal? @db.Decimal(10, 2)
+  image                   String?
+  thumbnail               String?
+  images                  String[]
+  product_link            String?
+  price                   Decimal? @db.Decimal(10, 2)
+  price_per_unit          Decimal? @db.Decimal(10, 2)
+  seller                  String?
+  protein                 Decimal? @db.Decimal(10, 2)
+  fat                     Decimal? @db.Decimal(10, 2)
+  carbohydrates           Decimal? @db.Decimal(10, 2)
+  calories                Decimal? @db.Decimal(10, 2)
+  calories_per_100g       Decimal? @db.Decimal(10, 2)
+  salt                    Decimal? @db.Decimal(10, 2)
+  sugar                   Decimal? @db.Decimal(10, 2)
+  fiber                   Decimal? @db.Decimal(10, 2)
+  saturated_fat           Decimal? @db.Decimal(10, 2)
+  monounsaturated_fat     Decimal? @db.Decimal(10, 2)
+  polyunsaturated_fat     Decimal? @db.Decimal(10, 2)
+  cholesterol             Decimal? @db.Decimal(10, 2)
+  sodium                  Decimal? @db.Decimal(10, 2)
+  vitamins                String[]
+  minerals                String[]
+  nutri_score             String?
+  total_dissolved_solids  Decimal? @db.Decimal(10, 2)
+  allergens               String[]
+  storage_conditions      String?
+  date                    String?
+  is_disabled             Boolean? @default(false)
+  category_id             String?
+  created_at              DateTime @default(now()) @db.Timestamptz(6)
+  updated_at              DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+
+  category MercadonaCategory?         @relation(fields: [category_id], references: [id], onDelete: SetNull)
+  links    MercadonaCategoryProduct[]
+
+  @@index([category_id])
+  @@map("mercadona_products")
+}
+
+model MercadonaCategoryProduct {
+  category_id String
+  product_id  String
+
+  category MercadonaCategory @relation(fields: [category_id], references: [id], onDelete: Cascade)
+  product  MercadonaProduct  @relation(fields: [product_id], references: [id], onDelete: Cascade)
+
+  @@id([category_id, product_id])
+  @@map("mercadona_category_products")
+}
+
+model CarrefourCategory {
+  id          String   @id
+  name        String
+  name_en     String?
+  parent_id   String?
+  order_index Int      @default(0)
+  is_not_food Boolean  @default(false)
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+
+  products CarrefourProduct[]
+  links    CarrefourCategoryProduct[]
+
+  @@index([parent_id])
+  @@map("carrefour_categories")
+}
+
+model CarrefourProduct {
+  id                      String   @id
+  name                    String
+  description             String?
+  brand                   String?
+  quantity                Decimal? @db.Decimal(10, 2)
+  packaging               String?
+  size_format             String?
+  size                    Decimal? @db.Decimal(10, 2)
+  ud_size_format          String?
+  ud_size                 Decimal? @db.Decimal(10, 2)
+  image                   String?
+  thumbnail               String?
+  images                  String[]
+  product_link            String?
+  price                   Decimal? @db.Decimal(10, 2)
+  price_per_unit          Decimal? @db.Decimal(10, 2)
+  seller                  String?
+  protein                 Decimal? @db.Decimal(10, 2)
+  fat                     Decimal? @db.Decimal(10, 2)
+  carbohydrates           Decimal? @db.Decimal(10, 2)
+  calories                Decimal? @db.Decimal(10, 2)
+  calories_per_100g       Decimal? @db.Decimal(10, 2)
+  salt                    Decimal? @db.Decimal(10, 2)
+  sugar                   Decimal? @db.Decimal(10, 2)
+  fiber                   Decimal? @db.Decimal(10, 2)
+  saturated_fat           Decimal? @db.Decimal(10, 2)
+  monounsaturated_fat     Decimal? @db.Decimal(10, 2)
+  polyunsaturated_fat     Decimal? @db.Decimal(10, 2)
+  cholesterol             Decimal? @db.Decimal(10, 2)
+  sodium                  Decimal? @db.Decimal(10, 2)
+  vitamins                String[]
+  minerals                String[]
+  nutri_score             String?
+  total_dissolved_solids  Decimal? @db.Decimal(10, 2)
+  allergens               String[]
+  storage_conditions      String?
+  date                    String?
+  is_disabled             Boolean? @default(false)
+  category_id             String?
+  created_at              DateTime @default(now()) @db.Timestamptz(6)
+  updated_at              DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+
+  category CarrefourCategory?         @relation(fields: [category_id], references: [id], onDelete: SetNull)
+  links    CarrefourCategoryProduct[]
+
+  @@index([category_id])
+  @@map("carrefour_products")
+}
+
+model CarrefourCategoryProduct {
+  category_id String
+  product_id  String
+
+  category CarrefourCategory @relation(fields: [category_id], references: [id], onDelete: Cascade)
+  product  CarrefourProduct  @relation(fields: [product_id], references: [id], onDelete: Cascade)
+
+  @@id([category_id, product_id])
+  @@map("carrefour_category_products")
+}
+
+model GenericCategory {
+  id          String   @id
+  name        String
+  name_en     String?
+  parent_id   String?
+  order_index Int      @default(0)
+  is_not_food Boolean  @default(false)
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+
+  products GenericProduct[]
+  links    GenericCategoryProduct[]
+
+  @@index([parent_id])
+  @@map("generic_categories")
+}
+
+model GenericProduct {
+  id                     String   @id
+  name                   String
+  description            String?
+  name_en                String?
+  description_en         String?
+  size_format            String?
+  category_id            String?
+  image                  String?
+  thumbnail              String?
+  image_url              String?
+  calories               Decimal? @db.Decimal(10, 2)
+  protein                Decimal? @db.Decimal(10, 2)
+  fat                    Decimal? @db.Decimal(10, 2)
+  carbohydrates          Decimal? @db.Decimal(10, 2)
+  salt                   Decimal? @db.Decimal(10, 2)
+  sugar                  Decimal? @db.Decimal(10, 2)
+  fiber                  Decimal? @db.Decimal(10, 2)
+  saturated_fat          Decimal? @db.Decimal(10, 2)
+  monounsaturated_fat    Decimal? @db.Decimal(10, 2)
+  polyunsaturated_fat    Decimal? @db.Decimal(10, 2)
+  cholesterol            Decimal? @db.Decimal(10, 2)
+  sodium                 Decimal? @db.Decimal(10, 2)
+  vitamins               String[]
+  minerals               String[]
+  nutri_score            String?
+  total_dissolved_solids Decimal? @db.Decimal(10, 2)
+  allergens              String[]
+  storage_conditions     String?
+  rate                   Decimal? @db.Decimal(10, 2)
+  created_at             DateTime @default(now()) @db.Timestamptz(6)
+  updated_at             DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+
+  category GenericCategory?         @relation(fields: [category_id], references: [id], onDelete: SetNull)
+  links    GenericCategoryProduct[]
+  matching GenericProductMatching[]
+
+  @@index([category_id])
+  @@map("generic_products")
+}
+
+model GenericCategoryProduct {
+  category_id String
+  product_id  String
+
+  category GenericCategory @relation(fields: [category_id], references: [id], onDelete: Cascade)
+  product  GenericProduct  @relation(fields: [product_id], references: [id], onDelete: Cascade)
+
+  @@id([category_id, product_id])
+  @@map("generic_category_products")
+}
+
+model GenericProductMatching {
+  id                 String   @id @default(uuid())
+  generic_product_id String
+  seller_product_id  String
+  seller             String
+  created_at         DateTime @default(now()) @db.Timestamptz(6)
+  updated_at         DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+
+  product GenericProduct @relation(fields: [generic_product_id], references: [id], onDelete: Cascade)
+
+  @@unique([generic_product_id, seller, seller_product_id])
+  @@map("generic_product_matching")
+}
+
+model Dish {
+  id                  String   @id
+  name                String
+  description         String?
+  name_en             String?
+  description_en      String?
+  recipe              String?
+  recipe_en           String?
+  image               String?
+  thumbnail           String?
+  difficulty          String?
+  course              String?
+  cuisine             String?
+  preparation_method  String?
+  dietary_category    String?
+  meal_time           String?
+  prep_time           Int?
+  cook_time           Int?
+  min_portions        Int?
+  expiration_time     Int?
+  tags                String[]
+  order_index         Int?
+  rating              Decimal? @db.Decimal(10, 2)
+  is_disabled         Boolean? @default(false)
+  created_at          DateTime @default(now()) @db.Timestamptz(6)
+  updated_at          DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+
+  products DishProduct[]
+
+  @@map("dishes")
+}
+
+model DishProduct {
+  dish_id     String
+  product_id  String
+  seller      String
+  size        Decimal? @db.Decimal(10, 2)
+  size_format String?
+  created_at  DateTime @default(now()) @db.Timestamptz(6)
+  updated_at  DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+
+  dish Dish @relation(fields: [dish_id], references: [id], onDelete: Cascade)
+
+  @@id([dish_id, product_id, seller])
+  @@map("dish_products")
+}
+
+model Price {
+  date           DateTime @db.Date
+  seller         String
+  total_products Int      @default(0)
+  prices         Json     @default("{}")
+  created_at     DateTime @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+
+  @@id([date, seller])
+  @@index([seller])
+  @@index([date])
+  @@map("prices")
+}
