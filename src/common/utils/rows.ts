@@ -47,8 +47,8 @@ function coerce(field: string, value: unknown): unknown {
     return value;
   }
 
-  if (TIMESTAMP_FIELDS.has(field) || field === 'date') {
-    const date = new Date(field === 'date' ? `${value.slice(0, 10)}T00:00:00.000Z` : value);
+  if (TIMESTAMP_FIELDS.has(field)) {
+    const date = new Date(value);
 
     if (Number.isNaN(date.getTime())) {
       throw new BadRequestException(`${field} is not a valid date`);
