@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
 
 import { GenericProductsService } from './generic-products.service';
@@ -90,6 +91,20 @@ export class GenericProductsController {
   @Put('product-matching')
   bulkMatching(@Body() body: unknown) {
     return this.genericProductsService.bulkUpsertMatching(body);
+  }
+
+  @Delete('product-matching')
+  async deleteMatchingByKey(
+    @Query('genericProductId') genericProductId: string,
+    @Query('seller') seller: string,
+    @Query('sellerProductId') sellerProductId: string,
+  ) {
+    await this.genericProductsService.deleteMatchingByKey(
+      genericProductId,
+      seller,
+      sellerProductId,
+    );
+    return { ok: true };
   }
 
   @Delete('product-matching/:id')

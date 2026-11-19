@@ -44,11 +44,7 @@ async function bootstrap() {
       return true;
     }
 
-    if (!isProduction()) {
-      return /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
-    }
-
-    return false;
+    return /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
   };
 
   app.enableCors({

@@ -7,12 +7,13 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
+import { isProduction } from '../../config/object-storage.config';
 import { ObjectStorageService } from './object-storage.service';
 import {
   assertStorageKey,
   buildObjectKey,
   extensionForContentType,
-  isImageKind,
+  resolveImageKind,
 } from './media-path.utils';
 
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
@@ -33,12 +34,10 @@ export class UploadsService {
       throw new BadRequestException('Image must be 5 MB or smaller');
     }
 
-    const kind = kindValue ?? 'dish-images';
+    const kind = resolveImageKind(kindValue ?? 'dishes');
 
-    if (!isImageKind(kind)) {
-      throw new BadRequestException(
-        'kind must be dish-images or generic-product-images',
-      );
+    if (!kind) {
+      throw new BadRequestException('kind must be products, dishes, or avatars');
     }
 
     const extension = extensionForContentType(file.mimetype);
@@ -51,9 +50,17 @@ export class UploadsService {
 
     if (this.objectStorage.isEnabled()) {
       await this.objectStorage.putObject(key, file.buffer, file.mimetype);
-      const url = await this.objectStorage.createPresignedReadUrl(key);
 
-      return { path: key, url };
+      return {
+        path: key,
+        url: await this.resolveStoredMedia(key),
+      };
+    }
+
+    if (isProduction()) {
+      throw new BadRequestException(
+        'Disk uploads are disabled in production; configure object storage',
+      );
     }
 
     const absolutePath = join(process.cwd(), 'uploads', key);
@@ -64,6 +71,19 @@ export class UploadsService {
       path: key,
       url: `/uploads/${key}`,
     };
+  }
+
+  async resolveStoredMedia(value: string): Promise<string> {
+    const key = this.mediaKey(value);
+    if (!key) {
+      return value;
+    }
+
+    if (this.objectStorage.isEnabled()) {
+      return this.objectStorage.createPresignedReadUrl(key);
+    }
+
+    return `/uploads/${key}`;
   }
 
   async getAccessUrl(path: string): Promise<{ url: string; expiresIn: number | null }> {
@@ -117,6 +137,23 @@ export class UploadsService {
         console.warn('Failed to delete image', key, error);
       }
     }
+  }
+
+  private mediaKey(value: string): string | null {
+    const clean = value.split('?')[0];
+    const marker = 'cestasmart/';
+    const index = clean.indexOf(marker);
+
+    if (index === -1) {
+      return null;
+    }
+
+    const key = clean.slice(index);
+    if (key.includes('..')) {
+      return null;
+    }
+
+    return key;
   }
 
   private readKey(path: string): string {

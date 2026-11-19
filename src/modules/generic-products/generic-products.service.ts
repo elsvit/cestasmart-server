@@ -148,6 +148,20 @@ export class GenericProductsService {
       .catch(error => this.missing(error, 'Matching product not found'));
   }
 
+  async deleteMatchingByKey(
+    genericProductId: string,
+    seller: string,
+    sellerProductId: string,
+  ) {
+    await this.prisma.genericProductMatching.deleteMany({
+      where: {
+        generic_product_id: genericProductId,
+        seller,
+        seller_product_id: sellerProductId,
+      },
+    });
+  }
+
   listLinks() {
     return this.prisma.genericCategoryProduct
       .findMany()

@@ -326,7 +326,7 @@ ALTER TABLE "generic_product_matching" ADD CONSTRAINT "generic_product_matching_
 -- AddForeignKey
 ALTER TABLE "dish_products" ADD CONSTRAINT "dish_products_dish_id_fkey" FOREIGN KEY ("dish_id") REFERENCES "dishes"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
--- Keep updated_at current on any SQL update, same as the Supabase tables.
+-- Keep updated_at current on any SQL update.
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN

@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { APP_FILTER, APP_GUARD } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 
 import { ApiKeyGuard } from './common/guards/api-key.guard';
 import { HttpExceptionFilter } from './common/errors/http-exception.filter';
@@ -11,6 +11,7 @@ import { DishesModule } from './modules/dishes/dishes.module';
 import { GenericProductsModule } from './modules/generic-products/generic-products.module';
 import { HealthController } from './modules/health/health.controller';
 import { PricesModule } from './modules/prices/prices.module';
+import { MediaUrlInterceptor } from './modules/uploads/media-url.interceptor';
 import { UploadsModule } from './modules/uploads/uploads.module';
 
 @Module({
@@ -35,6 +36,10 @@ import { UploadsModule } from './modules/uploads/uploads.module';
     {
       provide: APP_GUARD,
       useClass: ApiKeyGuard,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: MediaUrlInterceptor,
     },
   ],
 })

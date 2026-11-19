@@ -2,9 +2,17 @@ import { randomUUID } from 'node:crypto';
 
 export const STORAGE_PREFIX = 'cestasmart/';
 
-export const IMAGE_KINDS = ['dish-images', 'generic-product-images'] as const;
+export const IMAGE_KINDS = ['products', 'dishes', 'avatars'] as const;
 
 export type ImageKind = (typeof IMAGE_KINDS)[number];
+
+const IMAGE_KIND_ALIASES: Record<string, ImageKind> = {
+  products: 'products',
+  dishes: 'dishes',
+  avatars: 'avatars',
+  'generic-product-images': 'products',
+  'dish-images': 'dishes',
+};
 
 const IMAGE_MIME_EXTENSION: Record<string, string> = {
   'image/jpeg': '.jpg',
@@ -13,8 +21,8 @@ const IMAGE_MIME_EXTENSION: Record<string, string> = {
   'image/gif': '.gif',
 };
 
-export function isImageKind(value: string): value is ImageKind {
-  return (IMAGE_KINDS as readonly string[]).includes(value);
+export function resolveImageKind(value: string): ImageKind | undefined {
+  return IMAGE_KIND_ALIASES[value];
 }
 
 export function extensionForContentType(contentType: string): string | undefined {

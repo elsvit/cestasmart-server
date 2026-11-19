@@ -29,4 +29,4 @@ Set `API_KEY` to require the `x-api-key` header on every route except `/api/heal
 
 ## Data
 
-Tables follow the rows LaVidaSanaMenu writes to Supabase: Mercadona and Carrefour categories and products, generic products, dishes, dish products, and prices. Responses use the same snake_case fields.
+Tables hold Mercadona and Carrefour categories and products, generic products, dishes, dish products, and prices. Responses use the same snake_case fields the admin sends.
