@@ -13,6 +13,7 @@ const DEFAULT_PRESIGN_EXPIRY_SECONDS = 900;
 @Injectable()
 export class ObjectStorageService {
   private readonly client: S3Client | null;
+  private readonly endpoint: string | null;
   private readonly bucket: string;
   private readonly cdnBaseUrl: string | null;
   private readonly presignExpirySeconds: number;
@@ -27,6 +28,8 @@ export class ObjectStorageService {
       this.configService.get<string>('S3_SECRET_ACCESS_KEY');
     this.bucket = this.configService.get<string>('S3_BUCKET') ?? '';
     const region = this.configService.get<string>('S3_REGION') ?? 'eu-central';
+
+    this.endpoint = endpoint?.replace(/\/$/, '') ?? null;
 
     if (endpoint && accessKey && secretKey && this.bucket) {
       this.client = new S3Client({
@@ -56,6 +59,18 @@ export class ObjectStorageService {
 
   getPresignExpirySeconds(): number {
     return this.presignExpirySeconds;
+  }
+
+  getObjectUrl(key: string): string {
+    if (this.cdnBaseUrl) {
+      return `${this.cdnBaseUrl}/${key}`;
+    }
+
+    if (this.endpoint && this.bucket) {
+      return `${this.endpoint}/${this.bucket}/${key}`;
+    }
+
+    return `/uploads/${key}`;
   }
 
   async createPresignedReadUrl(key: string): Promise<string> {

@@ -1,5 +1,5 @@
-// La Vida Sana tables, stored in the cestasmart PostgreSQL database.
-// Column names match the payloads LaVidaSanaMenu sends to Supabase (snake_case).
+// CestaSmart tables, stored in the cestasmart PostgreSQL database.
+// Column names match the snake_case payloads the admin sends.
 
 generator client {
   provider = "prisma-client"
