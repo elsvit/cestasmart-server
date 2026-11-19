@@ -6,6 +6,7 @@ import { ApiKeyGuard } from './common/guards/api-key.guard';
 import { HttpExceptionFilter } from './common/errors/http-exception.filter';
 import { PrismaModule } from './db/prisma.module';
 import { CatalogModule } from './modules/catalog/catalog.module';
+import { EmailModule } from './modules/email/email.module';
 import { DishesModule } from './modules/dishes/dishes.module';
 import { GenericProductsModule } from './modules/generic-products/generic-products.module';
 import { HealthController } from './modules/health/health.controller';
@@ -18,6 +19,7 @@ import { UploadsModule } from './modules/uploads/uploads.module';
       isGlobal: true,
     }),
     PrismaModule,
+    EmailModule,
     UploadsModule,
     CatalogModule,
     GenericProductsModule,
